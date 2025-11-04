@@ -8,7 +8,7 @@ import { Mail, Lock, User as UserIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useRegister } from '@/lib/api/hooks';
+import { useAuthMutations } from '@/lib/api/hooks';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -23,7 +23,7 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
-  const register = useRegister();
+  const { register } = useAuthMutations();
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),

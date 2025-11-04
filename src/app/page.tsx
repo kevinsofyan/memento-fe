@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
 import { MainLayout } from '@/components/layouts/MainLayout';
 import { HomeClient } from './HomeClient';
-import { authServerService, booksServerService, entriesServerService } from '@/lib/api/server-services';
+import { authServerService, booksServerService } from '@/lib/api/server-services';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { redirect } from 'next/navigation';
 
@@ -16,12 +16,8 @@ async function HomeContent() {
     }),
     queryClient.prefetchQuery({
       queryKey: ['books'],
-      queryFn: booksServerService.getAll,
+      queryFn: () => booksServerService.getAll(),
     }),
-    // queryClient.prefetchQuery({
-    //   queryKey: ['entries'],
-    //   queryFn: () => entriesServerService.getAll(),
-    // }),
   ]);
 
   const user = queryClient.getQueryData(['user']);

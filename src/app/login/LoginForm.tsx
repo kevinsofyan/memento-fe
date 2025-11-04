@@ -8,7 +8,7 @@ import { Mail, Lock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useLogin, useUser } from '@/lib/api/hooks';
+import { useAuthMutations, useUser } from '@/lib/api/hooks';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -18,7 +18,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const login = useLogin();
+  const { login } = useAuthMutations();
 
 
   const form = useForm<LoginFormData>({

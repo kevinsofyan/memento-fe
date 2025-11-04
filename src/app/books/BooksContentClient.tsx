@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BookCard } from '@/components/journal/BookCard';
-import { Book } from '@/types/journal';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
-import { useBooks, useDeleteBook } from '@/lib/api/hooks';
+import { useBooksList, useBookMutations } from '@/lib/api/hooks';
+import { useDebounce } from '@/hooks/useDebounce';
+import { notifications } from '@/lib/notifications';
 
 const container = {
   hidden: { opacity: 0 },
@@ -21,22 +22,51 @@ const container = {
   },
 };
 
-
-
 export function BooksContentClient() {
-  const { data: books = [] } = useQuery<Book[]>({ 
-    queryKey: ['books'],
-    staleTime: 0,
-  });
-  
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const deleteBook = useDeleteBook();
-  const filteredBooks = books.filter(
-    (book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [page, setPage] = useState(1);
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; bookId: string | null; bookTitle: string }>({
+    open: false,
+    bookId: null,
+    bookTitle: '',
+  });
+  
+  // Debounce search query to avoid excessive API calls
+  const debouncedSearch = useDebounce(searchQuery, 500);
+  
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+  
+  const { data: response, isLoading } = useBooksList({ 
+    page, 
+    limit: 10, 
+    search: debouncedSearch || undefined 
+  });
+  const { remove } = useBookMutations();
+  
+  const books = response?.data || [];
+  const pagination = response?.pagination;
+
+  const handleDeleteClick = (bookId: string, bookTitle: string) => {
+    setDeleteDialog({ open: true, bookId, bookTitle });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteDialog.bookId) {
+      remove.mutate(deleteDialog.bookId, {
+        onSuccess: () => {
+          notifications.success('Book deleted', `"${deleteDialog.bookTitle}" has been permanently deleted.`);
+          setDeleteDialog({ open: false, bookId: null, bookTitle: '' });
+        },
+        onError: (error: any) => {
+          notifications.error('Failed to delete book', error?.message || 'Please try again.');
+        },
+      });
+    }
+  };
 
   return (
     <>
@@ -74,7 +104,7 @@ export function BooksContentClient() {
         </div>
       </motion.div>
 
-      {filteredBooks.length === 0 ? (
+      {books.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -101,11 +131,27 @@ export function BooksContentClient() {
               : 'grid-cols-1'
           )}
         >
-          {filteredBooks.map((book) => (
-            <BookCard key={book.id} book={book} onDelete={() => deleteBook.mutate(book.id)} />
+          {books.map((book) => (
+            <BookCard 
+              key={book.id} 
+              book={book} 
+              onDelete={() => handleDeleteClick(book.id, book.title)} 
+            />
           ))}
         </motion.div>
       )}
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, bookId: null, bookTitle: '' })}
+        onConfirm={handleConfirmDelete}
+        title="Delete Book"
+        description={`Are you sure you want to delete "${deleteDialog.bookTitle}"? This action cannot be undone and will permanently delete all entries in this book.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        isLoading={remove.isPending}
+      />
     </>
   );
 }

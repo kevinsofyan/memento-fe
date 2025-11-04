@@ -6,11 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUIStore } from '@/stores/ui';
-import { useQuery } from '@tanstack/react-query';
-import { Book, Entry } from '@/types/journal';
-import { User } from '@/types/auth';
-import { useUserStore } from '@/stores/user';
-import { useEffect } from 'react';
+import { useUser, useBooksList, useEntriesList } from '@/lib/api/hooks';
 
 const container = {
   hidden: { opacity: 0 },
@@ -29,18 +25,13 @@ const item = {
 
 export function HomeClient() {
   const setCreateBookDialogOpen = useUIStore((state) => state.setCreateBookDialogOpen);
-  const setUser = useUserStore((state) => state.setUser);
 
-  const { data: user } = useQuery<User | null>({ queryKey: ['user'] });
-  const { data: books = [] } = useQuery<Book[]>({ queryKey: ['books'] });
-  const { data: entries = [] } = useQuery<Entry[]>({ queryKey: ['entries'] });
+  useUser();
+  const { data: booksResponse } = useBooksList({ limit: 100 });
+  const { data: entriesResponse } = useEntriesList({ limit: 100 });
 
-  useEffect(() => {
-    if (user) {
-      setUser(user);
-    }
-  }, [user, setUser]);
-  
+  const books = booksResponse?.data || [];
+  const entries = entriesResponse?.data || [];
 
   const stats = [
     {

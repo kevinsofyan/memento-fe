@@ -6,9 +6,10 @@ import { Search, Heart, Calendar, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EntryCard } from '@/components/journal/EntryCard';
-import { useDeleteEntry, useUpdateEntry } from '@/lib/api/hooks';
+import { useEntryMutations } from '@/lib/api/hooks';
 import { Entry } from '@/types/journal';
 import { cn } from '@/lib/utils';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const container = {
   hidden: { opacity: 0 },
@@ -25,17 +26,19 @@ interface EntriesClientProps {
 }
 
 export function EntriesClient({ initialEntries }: EntriesClientProps) {
-  const { mutate: deleteEntry } = useDeleteEntry();
-  const { mutate: updateEntry } = useUpdateEntry();
+  const { remove, update } = useEntryMutations();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterMode, setFilterMode] = useState<'all' | 'favorites'>('all');
 
+  // Debounce search query for better performance
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
   const filteredEntries = initialEntries
     .filter(
       (entry) =>
-        (entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          entry.content.toLowerCase().includes(searchQuery.toLowerCase())) &&
+        (entry.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          entry.content.toLowerCase().includes(debouncedSearch.toLowerCase())) &&
         (filterMode === 'all' || entry.isFavorite)
     )
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -43,7 +46,7 @@ export function EntriesClient({ initialEntries }: EntriesClientProps) {
   const toggleFavorite = (id: string) => {
     const entry = initialEntries.find((e) => e.id === id);
     if (entry) {
-      updateEntry({ id, isFavorite: !entry.isFavorite });
+      update.mutate({ id, isFavorite: !entry.isFavorite });
     }
   };
 
@@ -134,7 +137,7 @@ export function EntriesClient({ initialEntries }: EntriesClientProps) {
             <EntryCard
               key={entry.id}
               entry={entry}
-              onDelete={deleteEntry}
+              onDelete={() => remove.mutate(entry.id)}
               onToggleFavorite={toggleFavorite}
             />
           ))}

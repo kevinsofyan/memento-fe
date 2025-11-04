@@ -13,12 +13,15 @@ interface EntriesPageProps {
 }
 
 async function EntriesContent({ bookId }: { bookId: string }) {
-  const [book, entries] = await Promise.all([booksServerService.getById(bookId), entriesServerService.getAll(bookId)]);
+  const [book, entriesResponse] = await Promise.all([
+    booksServerService.getById(bookId), 
+    entriesServerService.getAll({ bookId })
+  ]);
 
   return (
     <>
       <EntriesHeader book={book} />
-      <EntriesClient initialEntries={entries} />
+      <EntriesClient initialEntries={entriesResponse.data} />
       <CreateEntryDialog bookId={bookId} />
     </>
   );

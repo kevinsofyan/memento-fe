@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie';
+
 type FetchOptions = RequestInit & {
   params?: Record<string, string | number | boolean | undefined>;
 };
@@ -18,6 +20,18 @@ class APIClient {
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
+  }
+
+  private getAuthToken(): string | null {
+    const authStorage = Cookies.get('memento-auth-storage');
+    if (!authStorage) return null;
+    
+    try {
+      const parsed = JSON.parse(authStorage);
+      return parsed.state?.access_token || null;
+    } catch {
+      return null;
+    }
   }
 
   private buildURL(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
@@ -41,6 +55,7 @@ class APIClient {
     options: FetchOptions = {}
   ): Promise<T> {
     const { params, ...fetchOptions } = options;
+    const token = this.getAuthToken();
     
     const url = this.buildURL(endpoint, params);
     
@@ -48,6 +63,7 @@ class APIClient {
       ...fetchOptions,
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...fetchOptions.headers,
       },
     };

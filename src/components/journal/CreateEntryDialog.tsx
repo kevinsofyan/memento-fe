@@ -22,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { useCreateEntry } from '@/lib/api/hooks';
+import { useEntryMutations } from '@/lib/api/hooks';
 import { useUIStore } from '@/stores/ui';
 import { cn } from '@/lib/utils';
 
@@ -51,7 +51,7 @@ interface CreateEntryDialogProps {
 export const CreateEntryDialog = ({ bookId }: CreateEntryDialogProps) => {
   const isOpen = useUIStore((state) => state.isCreateEntryDialogOpen);
   const setIsOpen = useUIStore((state) => state.setCreateEntryDialogOpen);
-  const { mutate: createEntry, isPending } = useCreateEntry();
+  const { create } = useEntryMutations();
 
   const form = useForm<CreateEntryForm>({
     resolver: zodResolver(createEntrySchema),
@@ -70,7 +70,7 @@ export const CreateEntryDialog = ({ bookId }: CreateEntryDialogProps) => {
       .map((tag) => tag.trim())
       .filter(Boolean);
 
-    createEntry(
+    create.mutate(
       {
         bookId: data.bookId,
         title: data.title,
@@ -193,12 +193,12 @@ export const CreateEntryDialog = ({ bookId }: CreateEntryDialogProps) => {
                 type="button"
                 variant="outline"
                 onClick={() => setIsOpen(false)}
-                disabled={isPending}
+                disabled={create.isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? 'Creating...' : 'Create Entry'}
+              <Button type="submit" disabled={create.isPending}>
+                {create.isPending ? 'Creating...' : 'Create Entry'}
               </Button>
             </div>
           </form>

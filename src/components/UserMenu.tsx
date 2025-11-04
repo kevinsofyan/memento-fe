@@ -3,11 +3,11 @@
 import { LogOut, User as UserIcon, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUserStore } from '@/stores/user';
-import { useLogout } from '@/lib/api/hooks';
+import { useAuthMutations } from '@/lib/api/hooks';
 
 export function UserMenu() {
   const user = useUserStore((state) => state.user);
-  const logout = useLogout();
+  const { logout } = useAuthMutations();
 
   if (!user) return null;
 

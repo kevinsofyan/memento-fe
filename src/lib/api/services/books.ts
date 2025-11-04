@@ -1,14 +1,41 @@
+import { PaginatedResponse } from '@/types/misc';
 import { apiClient } from '../client';
-import { Book, CreateBookInput, UpdateBookInput } from '@/types/journal';
+import { 
+  Book, 
+  BookDTO, 
+  CreateBookInput, 
+  UpdateBookInput,
+  BooksQueryParams,
+  transformBookDTO,
+  transformBookInput,
+  transformBookUpdateInput
+} from '@/types/journal';
 
 export const booksService = {
-  create: (data: CreateBookInput) =>
-    apiClient.post<Book>('/books', data),
+  getAll: async (params?: BooksQueryParams): Promise<PaginatedResponse<Book>> => {
+    const response = await apiClient.get<PaginatedResponse<BookDTO>>('/journal/books', { params });
+    return {
+      data: response.data.map(transformBookDTO),
+      pagination: response.pagination,
+    };
+  },
 
-  update: ({ id, ...data }: UpdateBookInput) =>
-    apiClient.patch<Book>(`/books/${id}`, data),
+  getById: async (id: string): Promise<Book> => {
+    const dto = await apiClient.get<BookDTO>(`/journal/books/${id}`);
+    return transformBookDTO(dto);
+  },
+
+  create: async (data: CreateBookInput): Promise<Book> => {
+    const dto = await apiClient.post<BookDTO>('/journal/books', transformBookInput(data));
+    return transformBookDTO(dto);
+  },
+
+  update: async ({ id, ...data }: UpdateBookInput): Promise<Book> => {
+    const dto = await apiClient.patch<BookDTO>(`/journal/books/${id}`, transformBookUpdateInput({ id, ...data }));
+    return transformBookDTO(dto);
+  },
 
   delete: (id: string) =>
-    apiClient.delete<void>(`/books/${id}`),
+    apiClient.delete<void>(`/journal/books/${id}`),
 };
 

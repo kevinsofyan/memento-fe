@@ -10,7 +10,7 @@ async function BooksContent() {
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
     queryKey: ['books'],
-    queryFn: booksServerService.getAll,
+    queryFn: () => booksServerService.getAll(),
   });
   const dehydratedState = dehydrate(queryClient);
 

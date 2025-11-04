@@ -21,8 +21,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { useCreateBook } from '@/lib/api/hooks';
+import { useBookMutations } from '@/lib/api/hooks';
 import { useUIStore } from '@/stores/ui';
+import { notifications } from '@/lib/notifications';
 
 const createBookSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title is too long'),
@@ -47,7 +48,7 @@ const PRESET_COLORS = [
 export const CreateBookDialog = () => {
   const isOpen = useUIStore((state) => state.isCreateBookDialogOpen);
   const setIsOpen = useUIStore((state) => state.setCreateBookDialogOpen);
-  const { mutate: createBook, isPending } = useCreateBook();
+  const { create } = useBookMutations();
 
   const form = useForm<CreateBookForm>({
     resolver: zodResolver(createBookSchema),
@@ -60,10 +61,14 @@ export const CreateBookDialog = () => {
   });
 
   const onSubmit = (data: CreateBookForm) => {
-    createBook(data, {
+    create.mutate(data, {
       onSuccess: () => {
+        notifications.success('Book created', `"${data.title}" has been created successfully.`);
         form.reset();
         setIsOpen(false);
+      },
+      onError: (error: any) => {
+        notifications.error('Failed to create book', error?.message || 'Please try again.');
       },
     });
   };
@@ -88,6 +93,7 @@ export const CreateBookDialog = () => {
                   <FormLabel>Title</FormLabel>
                   <FormControl>
                     <Input
+                      className="mt-1"
                       placeholder="My Journal"
                       error={!!form.formState.errors.title}
                       {...field}
@@ -107,7 +113,7 @@ export const CreateBookDialog = () => {
                   <FormControl>
                     <Textarea
                       placeholder="What's this book about?"
-                      className="min-h-[80px]"
+                      className="min-h-[80px] mt-2"
                       error={!!form.formState.errors.description}
                       {...field}
                     />
@@ -117,70 +123,18 @@ export const CreateBookDialog = () => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="emoji"
-              render={({ field }: { field: any }) => (
-                <FormItem>
-                  <FormLabel>Emoji (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="📖"
-                      maxLength={2}
-                      error={!!form.formState.errors.emoji}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="coverColor"
-              render={({ field }: { field: any }) => (
-                <FormItem>
-                  <FormLabel>Cover Color</FormLabel>
-                  <FormControl>
-                    <div className="space-y-3">
-                      <div className="flex gap-2 flex-wrap">
-                        {PRESET_COLORS.map((color) => (
-                          <button
-                            key={color}
-                            type="button"
-                            className="w-10 h-10 rounded-lg border-2 transition-all hover:scale-110"
-                            style={{
-                              backgroundColor: color,
-                              borderColor: field.value === color ? 'white' : 'transparent',
-                            }}
-                            onClick={() => field.onChange(color)}
-                          />
-                        ))}
-                      </div>
-                      <Input
-                        type="color"
-                        className="h-10"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsOpen(false)}
-                disabled={isPending}
+                disabled={create.isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? 'Creating...' : 'Create Book'}
+              <Button type="submit" disabled={create.isPending}>
+                {create.isPending ? 'Creating...' : 'Create Book'}
               </Button>
             </div>
           </form>

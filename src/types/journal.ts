@@ -1,13 +1,13 @@
-import { User } from "@/schemas";
+import { IUser } from "./user";
 
-export interface BooksQueryParams {
+export interface IBooksQueryParams {
   page?: number;
   limit?: number;
   search?: string;
   [key: string]: string | number | boolean | undefined;
 }
 
-export interface EntriesQueryParams {
+export interface IEntriesQueryParams {
   page?: number;
   limit?: number;
   search?: string;
@@ -15,7 +15,7 @@ export interface EntriesQueryParams {
   [key: string]: string | number | boolean | undefined;
 }
 
-export interface BookDTO {
+export interface IBookDTO {
   id: string;
   owner_id: string;
   title: string;
@@ -25,11 +25,11 @@ export interface BookDTO {
   entries_count?: number;
   created_at: string;
   updated_at: string;
-  owner: User;
-  users: User[];
+  owner: IUser;
+  users: IUser[];
 }
 
-export interface Book {
+export interface IBook {
   id: string;
   ownerId: string;
   title: string;
@@ -39,42 +39,40 @@ export interface Book {
   entriesCount?: number;
   createdAt: string;
   updatedAt: string;
-  owner: User;
-  users: User[];
+  owner: IUser;
+  users: IUser[];
 }
 
-export interface EntryDTO {
+export interface IEntryDTO {
   id: string;
   book_id: string;
   title: string;
-  content: string;
-  mood?: 'great' | 'good' | 'okay' | 'bad' | 'terrible';
-  tags: string[];
+  content: any;
+  mood?: "great" | "good" | "okay" | "bad" | "terrible";
+  tags?: string[];
   created_at: string;
   updated_at: string;
-  is_favorite: boolean;
 }
 
-export interface Entry {
+export interface IEntry {
   id: string;
   bookId: string;
   title: string;
-  content: string;
-  mood?: 'great' | 'good' | 'okay' | 'bad' | 'terrible';
+  content: any;
+  mood?: "great" | "good" | "okay" | "bad" | "terrible";
   tags: string[];
   createdAt: string;
   updatedAt: string;
-  isFavorite: boolean;
 }
 
-export interface CreateBookInput {
+export interface ICreateBookInput {
   title: string;
   description?: string;
   coverColor: string;
   emoji?: string;
 }
 
-export interface UpdateBookInput {
+export interface IUpdateBookInput {
   id: string;
   title?: string;
   description?: string;
@@ -82,24 +80,23 @@ export interface UpdateBookInput {
   emoji?: string;
 }
 
-export interface CreateEntryInput {
+export interface ICreateEntryInput {
   bookId: string;
   title: string;
-  content: string;
-  mood?: 'great' | 'good' | 'okay' | 'bad' | 'terrible';
+  content: any;
+  mood?: "great" | "good" | "okay" | "bad" | "terrible";
   tags?: string[];
 }
 
-export interface UpdateEntryInput {
+export interface IUpdateEntryInput {
   id: string;
   title?: string;
-  content?: string;
-  mood?: 'great' | 'good' | 'okay' | 'bad' | 'terrible';
+  content?: any;
+  mood?: "great" | "good" | "okay" | "bad" | "terrible";
   tags?: string[];
-  isFavorite?: boolean;
 }
 
-export function transformBookDTO(dto: BookDTO): Book {
+export function transformBookDTO(dto: IBookDTO): IBook {
   return {
     id: dto.id,
     ownerId: dto.owner_id,
@@ -115,21 +112,20 @@ export function transformBookDTO(dto: BookDTO): Book {
   };
 }
 
-export function transformEntryDTO(dto: EntryDTO): Entry {
+export function transformEntryDTO(dto: IEntryDTO): IEntry {
   return {
     id: dto.id,
     bookId: dto.book_id,
     title: dto.title,
     content: dto.content,
     mood: dto.mood,
-    tags: dto.tags,
+    tags: dto.tags || [],
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
-    isFavorite: dto.is_favorite,
   };
 }
 
-export function transformBookInput(input: CreateBookInput) {
+export function transformBookInput(input: ICreateBookInput) {
   return {
     title: input.title,
     description: input.description,
@@ -138,7 +134,7 @@ export function transformBookInput(input: CreateBookInput) {
   };
 }
 
-export function transformBookUpdateInput(input: UpdateBookInput) {
+export function transformBookUpdateInput(input: IUpdateBookInput) {
   const { id, ...rest } = input;
   return {
     title: rest.title,
@@ -148,7 +144,7 @@ export function transformBookUpdateInput(input: UpdateBookInput) {
   };
 }
 
-export function transformEntryInput(input: CreateEntryInput) {
+export function transformEntryInput(input: ICreateEntryInput) {
   return {
     book_id: input.bookId,
     title: input.title,
@@ -158,14 +154,26 @@ export function transformEntryInput(input: CreateEntryInput) {
   };
 }
 
-export function transformEntryUpdateInput(input: UpdateEntryInput) {
+export function transformEntryUpdateInput(input: IUpdateEntryInput) {
   const { id, ...rest } = input;
   return {
     title: rest.title,
     content: rest.content,
     mood: rest.mood,
     tags: rest.tags,
-    is_favorite: rest.isFavorite,
   };
 }
 
+export function getTextFromContent(content: any): string {
+  if (!content) return "";
+  if (typeof content === "string") {
+    if (content.startsWith("<")) {
+      const div = document.createElement("div");
+      div.innerHTML = content;
+      return div.textContent || div.innerText || "";
+    }
+    return content;
+  }
+  if (content.text) return content.text;
+  return "";
+}

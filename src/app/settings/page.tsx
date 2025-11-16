@@ -1,11 +1,17 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Moon, Sun, Bell, Lock, User, Database } from 'lucide-react';
-import { MainLayout } from '@/components/layouts/MainLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useUIStore } from '@/stores/ui';
+import { motion } from "framer-motion";
+import { Moon, Sun, Bell, Lock, User, Database } from "lucide-react";
+import { MainLayout } from "@/components/layouts/MainLayout";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useUIStore } from "@/stores/ui";
 
 const container = {
   hidden: { opacity: 0 },
@@ -50,7 +56,7 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  {theme === 'dark' ? (
+                  {theme === "dark" ? (
                     <Moon className="h-5 w-5" />
                   ) : (
                     <Sun className="h-5 w-5" />
@@ -66,11 +72,11 @@ export default function SettingsPage() {
                   <div>
                     <h4 className="font-medium mb-1">Theme</h4>
                     <p className="text-sm text-muted-foreground">
-                      Current theme: {theme === 'dark' ? 'Dark' : 'Light'}
+                      Current theme: {theme === "dark" ? "Dark" : "Light"}
                     </p>
                   </div>
                   <Button onClick={toggleTheme} variant="outline">
-                    {theme === 'dark' ? (
+                    {theme === "dark" ? (
                       <>
                         <Sun className="h-4 w-4 mr-2" />
                         Switch to Light
@@ -123,9 +129,7 @@ export default function SettingsPage() {
                   <User className="h-5 w-5" />
                   Account
                 </CardTitle>
-                <CardDescription>
-                  Manage your account settings
-                </CardDescription>
+                <CardDescription>Manage your account settings</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -181,9 +185,7 @@ export default function SettingsPage() {
                   <Database className="h-5 w-5" />
                   Data Management
                 </CardTitle>
-                <CardDescription>
-                  Manage your data and storage
-                </CardDescription>
+                <CardDescription>Manage your data and storage</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

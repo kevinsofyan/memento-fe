@@ -1,11 +1,10 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { cookieStorage } from '@/lib/cookie-storage';
-import { User } from '@/types/auth';
-
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { cookieStorage } from "@/lib/cookie-storage";
+import { IUser } from "@/types/user";
 interface UserState {
-  user: User | null;
-  setUser: (user: User | null) => void;
+  user: IUser | null;
+  setUser: (user: IUser | null) => void;
   clearUser: () => void;
 }
 
@@ -17,9 +16,8 @@ export const useUserStore = create<UserState>()(
       clearUser: () => set({ user: null }),
     }),
     {
-      name: 'user-storage',
+      name: "user-storage",
       storage: cookieStorage,
     }
   )
 );
-

@@ -17,12 +17,14 @@ export const PaginatedSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
     pageSize: z.number(),
   });
 
-export const UsersResponseSchema = PaginatedSchema(z.object({
-  id: z.string().uuid(),
-  name: z.string(),
-  email: z.string().email(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-}));
+export const UsersResponseSchema = PaginatedSchema(
+  z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    email: z.string().email(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+  })
+);
 
 export type UsersResponse = z.infer<typeof UsersResponseSchema>;

@@ -1,38 +1,7 @@
-import { Suspense } from 'react';
-import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
-import { MainLayout } from '@/components/layouts/MainLayout';
-import { HomeClient } from './HomeClient';
-import { authServerService, booksServerService } from '@/lib/api/server-services';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { redirect } from 'next/navigation';
-
-async function HomeContent() {
-  const queryClient = new QueryClient();
-
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: ['user'],
-      queryFn: authServerService.me,
-    }),
-    queryClient.prefetchQuery({
-      queryKey: ['books'],
-      queryFn: () => booksServerService.getAll(),
-    }),
-  ]);
-
-  const user = queryClient.getQueryData(['user']);
-  if (!user) {
-    redirect('/login');
-  }
-
-  const dehydratedState = dehydrate(queryClient);
-
-  return (
-    <HydrationBoundary state={dehydratedState}>
-      <HomeClient />
-    </HydrationBoundary>
-  );
-}
+import { Suspense } from "react";
+import { MainLayout } from "@/components/layouts/MainLayout";
+import { HomeClient } from "./HomeClient";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 function HomeLoading() {
   return (
@@ -66,7 +35,7 @@ export default function HomePage() {
     <MainLayout>
       <div className="container mx-auto px-8 py-12">
         <Suspense fallback={<HomeLoading />}>
-          <HomeContent />
+          <HomeClient />
         </Suspense>
       </div>
     </MainLayout>

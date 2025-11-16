@@ -1,34 +1,41 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Calendar, Heart, Tag, MoreVertical, Trash2, Edit2 } from 'lucide-react';
-import { Entry } from '@/types/journal';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { motion } from "framer-motion";
+import {
+  Calendar,
+  Heart,
+  Tag,
+  MoreVertical,
+  Trash2,
+  Edit2,
+} from "lucide-react";
+import { IEntry, getTextFromContent } from "@/types/journal";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface EntryCardProps {
-  entry: Entry;
+  entry: IEntry;
   onDelete?: (id: string) => void;
-  onEdit?: (entry: Entry) => void;
+  onEdit?: (entry: IEntry) => void;
   onToggleFavorite?: (id: string) => void;
-  onClick?: (entry: Entry) => void;
+  onClick?: (entry: IEntry) => void;
 }
 
 const moodEmojis = {
-  great: '😊',
-  good: '🙂',
-  okay: '😐',
-  bad: '😞',
-  terrible: '😢',
+  great: "😊",
+  good: "🙂",
+  okay: "😐",
+  bad: "😞",
+  terrible: "😢",
 };
 
 const moodColors = {
-  great: 'text-green-500',
-  good: 'text-blue-500',
-  okay: 'text-yellow-500',
-  bad: 'text-orange-500',
-  terrible: 'text-red-500',
+  great: "text-green-500",
+  good: "text-blue-500",
+  okay: "text-yellow-500",
+  bad: "text-orange-500",
+  terrible: "text-red-500",
 };
 
 export const EntryCard = ({
@@ -62,7 +69,7 @@ export const EntryCard = ({
                   {entry.title}
                 </h3>
                 {entry.mood && (
-                  <span className={cn('text-xl', moodColors[entry.mood])}>
+                  <span className={cn("text-xl", moodColors[entry.mood])}>
                     {moodEmojis[entry.mood]}
                   </span>
                 )}
@@ -75,15 +82,22 @@ export const EntryCard = ({
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    'h-8 w-8',
-                    entry.isFavorite ? 'text-red-500' : 'opacity-0 group-hover:opacity-100'
+                    "h-8 w-8",
+                    entry.isFavorite
+                      ? "text-red-500"
+                      : "opacity-0 group-hover:opacity-100"
                   )}
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation();
                     onToggleFavorite(entry.id);
                   }}
                 >
-                  <Heart className={cn('h-4 w-4', entry.isFavorite && 'fill-current')} />
+                  <Heart
+                    className={cn(
+                      "h-4 w-4",
+                      entry.isFavorite && "fill-current"
+                    )}
+                  />
                 </Button>
               )}
               <Button
@@ -98,7 +112,7 @@ export const EntryCard = ({
           </div>
 
           <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-            {entry.content}
+            {getTextFromContent(entry.content)}
           </p>
 
           <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -106,20 +120,20 @@ export const EntryCard = ({
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 <span>
-                  {new Date(entry.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
+                  {new Date(entry.createdAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
                   })}
                 </span>
               </div>
 
-              {entry.tags.length > 0 && (
+              {/* {entry.tags.length > 0 && (
                 <div className="flex items-center gap-1">
                   <Tag className="h-3 w-3" />
                   <span>{entry.tags.length}</span>
                 </div>
-              )}
+              )} */}
             </div>
 
             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -152,7 +166,7 @@ export const EntryCard = ({
             </div>
           </div>
 
-          {entry.tags.length > 0 && (
+          {/* {entry.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border">
               {entry.tags.slice(0, 3).map((tag) => (
                 <span
@@ -168,10 +182,9 @@ export const EntryCard = ({
                 </span>
               )}
             </div>
-          )}
+          )} */}
         </div>
       </Card>
     </motion.div>
   );
 };
-

@@ -1,13 +1,17 @@
-'use client';
+"use client";
 
-import { LogOut, User as UserIcon, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useUserStore } from '@/stores/user';
-import { useAuthMutations } from '@/lib/api/hooks';
+import { LogOut, User as UserIcon, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useUser } from "@/lib/api/hooks";
+import { useRouter } from "next/navigation";
 
 export function UserMenu() {
-  const user = useUserStore((state) => state.user);
-  const { logout } = useAuthMutations();
+  const { user } = useUser();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push("/logout");
+  };
 
   if (!user) return null;
 
@@ -16,7 +20,11 @@ export function UserMenu() {
       <div className="flex items-center gap-3 mb-3">
         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
           {user.avatar ? (
-            <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full" />
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="w-10 h-10 rounded-full"
+            />
           ) : (
             <UserIcon className="h-5 w-5 text-primary" />
           )}
@@ -26,9 +34,13 @@ export function UserMenu() {
           <p className="text-xs text-muted-foreground truncate">{user.email}</p>
         </div>
       </div>
-      
+
       <div className="space-y-1">
-        <Button variant="ghost" className="w-full justify-start gap-2" size="sm">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2"
+          size="sm"
+        >
           <Settings className="h-4 w-4" />
           <span className="text-sm">Settings</span>
         </Button>
@@ -36,14 +48,12 @@ export function UserMenu() {
           variant="ghost"
           className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
           size="sm"
-          onClick={() => logout.mutate()}
-          disabled={logout.isPending}
+          onClick={handleLogout}
         >
           <LogOut className="h-4 w-4" />
-          <span className="text-sm">{logout.isPending ? 'Signing out...' : 'Sign Out'}</span>
+          <span className="text-sm">Sign Out</span>
         </Button>
       </div>
     </div>
   );
 }
-

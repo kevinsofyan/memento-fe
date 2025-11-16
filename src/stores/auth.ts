@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { cookieStorage } from '@/lib/cookie-storage';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { cookieStorage } from "@/lib/cookie-storage";
 
 interface AuthData {
   access_token: string;
@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>()(
           refresh_token: data.refresh_token,
           expires_in: data.expires_in,
         }),
-        clearAuth: () =>
+      clearAuth: () =>
         set({
           access_token: null,
           refresh_token: null,
@@ -36,9 +36,8 @@ export const useAuthStore = create<AuthState>()(
         }),
     }),
     {
-      name: 'memento-auth-storage',
+      name: "memento-auth-storage",
       storage: cookieStorage,
     }
   )
 );
-

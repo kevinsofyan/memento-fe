@@ -1,27 +1,16 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  phone_number: string;
-  avatar: string;
-  createdAt: string;
-}
-
-
-export interface LoginInput {
+export interface ILoginInput {
   email: string;
   password: string;
 }
 
-export interface RegisterInput {
+export interface IRegisterInput {
   name: string;
   email: string;
   password: string;
 }
 
-export interface AuthResponse {
+export interface IAuthResponse {
   access_token: string;
   expires_in: number;
   refresh_token: string;
 }
-

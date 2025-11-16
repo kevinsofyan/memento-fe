@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { MoreVertical, Trash2, Edit2 } from 'lucide-react';
-import { Book } from '@/types/journal';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { motion } from "framer-motion";
+import { MoreVertical, Trash2, Edit2 } from "lucide-react";
+import { IBook } from "@/types/journal";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface BookCardProps {
-  book: Book;
+  book: IBook;
   onDelete?: (id: string) => void;
-  onEdit?: (book: Book) => void;
+  onEdit?: (book: IBook) => void;
 }
 
 export const BookCard = ({ book, onDelete, onEdit }: BookCardProps) => {
@@ -39,9 +39,7 @@ export const BookCard = ({ book, onDelete, onEdit }: BookCardProps) => {
         <div className="relative p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              {book.emoji && (
-                <span className="text-4xl">{book.emoji}</span>
-              )}
+              {book.emoji && <span className="text-4xl">{book.emoji}</span>}
             </div>
             <div className="opacity-0 group-hover:opacity-100 transition-opacity">
               <Button
@@ -69,7 +67,8 @@ export const BookCard = ({ book, onDelete, onEdit }: BookCardProps) => {
 
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
             <span className="text-sm text-muted-foreground">
-              {book.entriesCount} {book.entriesCount === 1 ? 'entry' : 'entries'}
+              {book.entriesCount}{" "}
+              {book.entriesCount === 1 ? "entry" : "entries"}
             </span>
 
             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -104,11 +103,10 @@ export const BookCard = ({ book, onDelete, onEdit }: BookCardProps) => {
         <motion.div
           className="absolute bottom-0 left-0 h-1 bg-primary"
           initial={{ width: 0 }}
-          whileHover={{ width: '100%' }}
+          whileHover={{ width: "100%" }}
           transition={{ duration: 0.3 }}
         />
       </Card>
     </motion.div>
   );
 };
-

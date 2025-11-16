@@ -1,12 +1,18 @@
-import { Suspense } from 'react';
-import { BookOpen } from 'lucide-react';
-import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RegisterForm } from './RegisterForm';
+import { Suspense } from "react";
+import { BookOpen } from "lucide-react";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { RegisterForm } from "./RegisterForm";
 
 export const metadata = {
-  title: 'Create Account - Memento',
-  description: 'Create your Memento account',
+  title: "Create Account - Memento",
+  description: "Create your Memento account",
 };
 
 export default function RegisterPage() {
@@ -18,7 +24,9 @@ export default function RegisterPage() {
             <BookOpen className="h-8 w-8" />
           </div>
           <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-          <p className="text-muted-foreground">Start your journaling journey today</p>
+          <p className="text-muted-foreground">
+            Start your journaling journey today
+          </p>
         </div>
 
         <Card>
@@ -27,14 +35,19 @@ export default function RegisterPage() {
             <CardDescription>Create your Memento account</CardDescription>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded" />}>
+            <Suspense
+              fallback={<div className="h-96 animate-pulse bg-muted rounded" />}
+            >
               <RegisterForm />
             </Suspense>
 
             <div className="mt-6 text-center text-sm">
               <p className="text-muted-foreground">
-                Already have an account?{' '}
-                <Link href="/login" className="text-primary hover:underline font-medium">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="text-primary hover:underline font-medium"
+                >
                   Sign in
                 </Link>
               </p>
@@ -43,11 +56,11 @@ export default function RegisterPage() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-8">
-          By creating an account, you agree to our{' '}
+          By creating an account, you agree to our{" "}
           <Link href="/terms" className="underline hover:text-foreground">
             Terms of Service
-          </Link>{' '}
-          and{' '}
+          </Link>{" "}
+          and{" "}
           <Link href="/privacy" className="underline hover:text-foreground">
             Privacy Policy
           </Link>

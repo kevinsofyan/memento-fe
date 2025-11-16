@@ -1,25 +1,7 @@
-import { Suspense } from 'react';
-import { MainLayout } from '@/components/layouts/MainLayout';
-import { BooksHeader } from './BooksHeader';
-import { booksServerService } from '@/lib/api/server-services';
-import { BookOpen } from 'lucide-react';
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import { BooksContentClient } from './BooksContentClient';
-
-async function BooksContent() {
-  const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ['books'],
-    queryFn: () => booksServerService.getAll(),
-  });
-  const dehydratedState = dehydrate(queryClient);
-
-  return (
-    <HydrationBoundary state={dehydratedState}>
-      <BooksContentClient/>
-    </HydrationBoundary>
-  );
-}
+import { Suspense } from "react";
+import { MainLayout } from "@/components/layouts/MainLayout";
+import { BooksHeader } from "./BooksHeader";
+import { BooksContentClient } from "./BooksContentClient";
 
 function BooksLoading() {
   return (
@@ -37,7 +19,7 @@ export default function BooksPage() {
       <div className="container mx-auto px-8 py-12">
         <BooksHeader />
         <Suspense fallback={<BooksLoading />}>
-          <BooksContent />
+          <BooksContentClient />
         </Suspense>
       </div>
     </MainLayout>

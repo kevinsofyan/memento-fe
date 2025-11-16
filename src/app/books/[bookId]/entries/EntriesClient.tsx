@@ -1,15 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Heart, Calendar, Grid3x3, List } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { EntryCard } from '@/components/journal/EntryCard';
-import { useEntryMutations } from '@/lib/api/hooks';
-import { Entry } from '@/types/journal';
-import { cn } from '@/lib/utils';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Search, Calendar, Grid3x3, List, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { EntryCard } from "@/components/journal/EntryCard";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { useEntries, useEntryMutations } from "@/lib/api/hooks";
+import { IEntry, getTextFromContent } from "@/types/journal";
+import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/useDebounce";
+import { notifications } from "@/lib/notifications";
 
 const container = {
   hidden: { opacity: 0 },
@@ -22,31 +25,61 @@ const container = {
 };
 
 interface EntriesClientProps {
-  initialEntries: Entry[];
+  bookId: string;
 }
 
-export function EntriesClient({ initialEntries }: EntriesClientProps) {
-  const { remove, update } = useEntryMutations();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filterMode, setFilterMode] = useState<'all' | 'favorites'>('all');
+export function EntriesClient({ bookId }: EntriesClientProps) {
+  const router = useRouter();
+  const { entries } = useEntries({ bookId });
+  const { remove } = useEntryMutations();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    entryId: string | null;
+    entryTitle: string;
+  }>({
+    open: false,
+    entryId: null,
+    entryTitle: "",
+  });
 
-  // Debounce search query for better performance
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const filteredEntries = initialEntries
+  const filteredEntries = entries
     .filter(
       (entry) =>
-        (entry.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          entry.content.toLowerCase().includes(debouncedSearch.toLowerCase())) &&
-        (filterMode === 'all' || entry.isFavorite)
+        entry.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        getTextFromContent(entry.content)
+          .toLowerCase()
+          .includes(debouncedSearch.toLowerCase())
     )
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
-  const toggleFavorite = (id: string) => {
-    const entry = initialEntries.find((e) => e.id === id);
-    if (entry) {
-      update.mutate({ id, isFavorite: !entry.isFavorite });
+  const handleDeleteClick = (entryId: string, entryTitle: string) => {
+    setDeleteDialog({ open: true, entryId, entryTitle });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteDialog.entryId) {
+      remove.mutate(deleteDialog.entryId, {
+        onSuccess: () => {
+          notifications.success(
+            "Entry deleted",
+            `"${deleteDialog.entryTitle}" has been permanently deleted.`
+          );
+          setDeleteDialog({ open: false, entryId: null, entryTitle: "" });
+        },
+        onError: (error: any) => {
+          notifications.error(
+            "Failed to delete entry",
+            error?.message || "Please try again."
+          );
+        },
+      });
     }
   };
 
@@ -63,42 +96,25 @@ export function EntriesClient({ initialEntries }: EntriesClientProps) {
           <Input
             placeholder="Search entries..."
             value={searchQuery}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setSearchQuery(e.target.value)
+            }
             className="pl-10"
           />
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            variant={filterMode === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilterMode('all')}
-          >
-            <Calendar className="h-4 w-4 mr-2" />
-            All
-          </Button>
-          <Button
-            variant={filterMode === 'favorites' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilterMode('favorites')}
-          >
-            <Heart className="h-4 w-4 mr-2" />
-            Favorites
-          </Button>
-        </div>
-
         <div className="flex gap-1 p-1 bg-muted rounded-lg">
           <Button
-            variant={viewMode === 'grid' ? 'default' : 'ghost'}
+            variant={viewMode === "grid" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setViewMode('grid')}
+            onClick={() => setViewMode("grid")}
           >
             <Grid3x3 className="h-4 w-4" />
           </Button>
           <Button
-            variant={viewMode === 'list' ? 'default' : 'ghost'}
+            variant={viewMode === "list" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setViewMode('list')}
+            onClick={() => setViewMode("list")}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -107,18 +123,17 @@ export function EntriesClient({ initialEntries }: EntriesClientProps) {
 
       {filteredEntries.length === 0 ? (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center py-20"
         >
           <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">
-            {searchQuery || filterMode === 'favorites' ? 'No entries found' : 'No entries yet'}
+            {searchQuery ? "No entries found" : "No entries yet"}
           </h3>
           <p className="text-muted-foreground mb-6">
-            {searchQuery || filterMode === 'favorites'
-              ? 'Try a different search or filter'
-              : 'Start writing your first journal entry'}
+            {searchQuery
+              ? "Try a different search query"
+              : "Start writing your first journal entry"}
           </p>
         </motion.div>
       ) : (
@@ -127,23 +142,49 @@ export function EntriesClient({ initialEntries }: EntriesClientProps) {
           initial="hidden"
           animate="show"
           className={cn(
-            'grid gap-6',
-            viewMode === 'grid'
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              : 'grid-cols-1'
+            "grid gap-6",
+            viewMode === "grid"
+              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              : "grid-cols-1"
           )}
         >
           {filteredEntries.map((entry) => (
             <EntryCard
               key={entry.id}
               entry={entry}
-              onDelete={() => remove.mutate(entry.id)}
-              onToggleFavorite={toggleFavorite}
+              onClick={() =>
+                router.push(`/books/${bookId}/entries/${entry.id}`)
+              }
+              onDelete={() => handleDeleteClick(entry.id, entry.title)}
             />
           ))}
         </motion.div>
       )}
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) =>
+          setDeleteDialog({ open, entryId: null, entryTitle: "" })
+        }
+        onConfirm={handleConfirmDelete}
+        title="Delete Entry"
+        description={`Are you sure you want to delete "${deleteDialog.entryTitle}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        isLoading={remove.isPending}
+      />
+
+      <motion.button
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => router.push(`/books/${bookId}/entries/new`)}
+        className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow z-50"
+      >
+        <Plus className="h-6 w-6" />
+      </motion.button>
     </>
   );
 }
-

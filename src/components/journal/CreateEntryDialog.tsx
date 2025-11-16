@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Smile, Frown, Meh, SmilePlus, Angry } from 'lucide-react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Smile, Frown, Meh, SmilePlus, Angry } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -18,30 +18,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useEntryMutations } from '@/lib/api/hooks';
-import { useUIStore } from '@/stores/ui';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useEntryMutations } from "@/lib/api/hooks";
+import { useUIStore } from "@/stores/ui";
+import { cn } from "@/lib/utils";
+import { notifications } from "@/lib/notifications";
 
 const createEntrySchema = z.object({
-  bookId: z.string().min(1, 'Book is required'),
-  title: z.string().min(1, 'Title is required').max(200, 'Title is too long'),
-  content: z.string().min(1, 'Content is required'),
-  mood: z.enum(['great', 'good', 'okay', 'bad', 'terrible']).optional(),
+  bookId: z.string().min(1, "Book is required"),
+  title: z.string().min(1, "Title is required").max(200, "Title is too long"),
+  content: z.string().min(1, "Content is required"),
+  mood: z.enum(["great", "good", "okay", "bad", "terrible"]).optional(),
   tags: z.string(),
 });
 
 type CreateEntryForm = z.infer<typeof createEntrySchema>;
 
 const MOODS = [
-  { value: 'great', icon: SmilePlus, label: 'Great', color: 'text-green-500' },
-  { value: 'good', icon: Smile, label: 'Good', color: 'text-blue-500' },
-  { value: 'okay', icon: Meh, label: 'Okay', color: 'text-yellow-500' },
-  { value: 'bad', icon: Frown, label: 'Bad', color: 'text-orange-500' },
-  { value: 'terrible', icon: Angry, label: 'Terrible', color: 'text-red-500' },
+  { value: "great", icon: SmilePlus, label: "Great", color: "text-green-500" },
+  { value: "good", icon: Smile, label: "Good", color: "text-blue-500" },
+  { value: "okay", icon: Meh, label: "Okay", color: "text-yellow-500" },
+  { value: "bad", icon: Frown, label: "Bad", color: "text-orange-500" },
+  { value: "terrible", icon: Angry, label: "Terrible", color: "text-red-500" },
 ] as const;
 
 interface CreateEntryDialogProps {
@@ -57,16 +58,16 @@ export const CreateEntryDialog = ({ bookId }: CreateEntryDialogProps) => {
     resolver: zodResolver(createEntrySchema),
     defaultValues: {
       bookId,
-      title: '',
-      content: '',
+      title: "",
+      content: "",
       mood: undefined,
-      tags: '',
+      tags: "",
     },
   });
 
   const onSubmit = (data: CreateEntryForm) => {
     const tags = data.tags
-      .split(',')
+      .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean);
 
@@ -74,14 +75,27 @@ export const CreateEntryDialog = ({ bookId }: CreateEntryDialogProps) => {
       {
         bookId: data.bookId,
         title: data.title,
-        content: data.content,
+        content: { text: data.content },
         mood: data.mood,
         tags,
       },
       {
         onSuccess: () => {
-          form.reset();
+          notifications.success("Entry created", "Your entry has been saved.");
+          form.reset({
+            bookId,
+            title: "",
+            content: "",
+            mood: undefined,
+            tags: "",
+          });
           setIsOpen(false);
+        },
+        onError: (error: any) => {
+          notifications.error(
+            "Failed to create entry",
+            error?.message || "Please try again."
+          );
         },
       }
     );
@@ -151,14 +165,14 @@ export const CreateEntryDialog = ({ bookId }: CreateEntryDialogProps) => {
                             key={mood.value}
                             type="button"
                             className={cn(
-                              'flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all hover:scale-105',
+                              "flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all hover:scale-105",
                               field.value === mood.value
-                                ? 'border-primary bg-accent'
-                                : 'border-transparent bg-muted/50'
+                                ? "border-primary bg-accent"
+                                : "border-transparent bg-muted/50"
                             )}
                             onClick={() => field.onChange(mood.value)}
                           >
-                            <Icon className={cn('h-6 w-6', mood.color)} />
+                            <Icon className={cn("h-6 w-6", mood.color)} />
                             <span className="text-xs">{mood.label}</span>
                           </button>
                         );
@@ -198,7 +212,7 @@ export const CreateEntryDialog = ({ bookId }: CreateEntryDialogProps) => {
                 Cancel
               </Button>
               <Button type="submit" disabled={create.isPending}>
-                {create.isPending ? 'Creating...' : 'Create Entry'}
+                {create.isPending ? "Creating..." : "Create Entry"}
               </Button>
             </div>
           </form>
@@ -207,4 +221,3 @@ export const CreateEntryDialog = ({ bookId }: CreateEntryDialogProps) => {
     </Dialog>
   );
 };
-

@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -17,32 +17,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useBookMutations } from '@/lib/api/hooks';
-import { useUIStore } from '@/stores/ui';
-import { notifications } from '@/lib/notifications';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useBookMutations } from "@/lib/api/hooks";
+import { useUIStore } from "@/stores/ui";
+import { notifications } from "@/lib/notifications";
 
 const createBookSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(100, 'Title is too long'),
-  description: z.string().max(500, 'Description is too long').optional(),
-  coverColor: z.string().regex(/^#[0-9A-F]{6}$/i, 'Invalid color'),
-  emoji: z.string().max(2, 'Please use a single emoji').optional(),
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  description: z.string().max(500, "Description is too long").optional(),
+  coverColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid color"),
+  emoji: z.string().max(2, "Please use a single emoji").optional(),
 });
 
 type CreateBookForm = z.infer<typeof createBookSchema>;
 
 const PRESET_COLORS = [
-  '#6366F1',
-  '#8B5CF6',
-  '#EC4899',
-  '#EF4444',
-  '#F59E0B',
-  '#10B981',
-  '#3B82F6',
-  '#06B6D4',
+  "#6366F1",
+  "#8B5CF6",
+  "#EC4899",
+  "#EF4444",
+  "#F59E0B",
+  "#10B981",
+  "#3B82F6",
+  "#06B6D4",
 ];
 
 export const CreateBookDialog = () => {
@@ -53,22 +53,28 @@ export const CreateBookDialog = () => {
   const form = useForm<CreateBookForm>({
     resolver: zodResolver(createBookSchema),
     defaultValues: {
-      title: '',
-      description: '',
+      title: "",
+      description: "",
       coverColor: PRESET_COLORS[0],
-      emoji: '',
+      emoji: "",
     },
   });
 
   const onSubmit = (data: CreateBookForm) => {
     create.mutate(data, {
       onSuccess: () => {
-        notifications.success('Book created', `"${data.title}" has been created successfully.`);
+        notifications.success(
+          "Book created",
+          `"${data.title}" has been created successfully.`
+        );
         form.reset();
         setIsOpen(false);
       },
       onError: (error: any) => {
-        notifications.error('Failed to create book', error?.message || 'Please try again.');
+        notifications.error(
+          "Failed to create book",
+          error?.message || "Please try again."
+        );
       },
     });
   };
@@ -123,7 +129,6 @@ export const CreateBookDialog = () => {
               )}
             />
 
-
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 type="button"
@@ -134,7 +139,7 @@ export const CreateBookDialog = () => {
                 Cancel
               </Button>
               <Button type="submit" disabled={create.isPending}>
-                {create.isPending ? 'Creating...' : 'Create Book'}
+                {create.isPending ? "Creating..." : "Create Book"}
               </Button>
             </div>
           </form>
@@ -143,4 +148,3 @@ export const CreateBookDialog = () => {
     </Dialog>
   );
 };
-

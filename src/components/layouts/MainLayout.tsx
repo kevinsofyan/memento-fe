@@ -1,30 +1,50 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { Sidebar } from './Sidebar';
-import { CreateBookDialog } from '@/components/journal/CreateBookDialog';
-import { useUser } from '@/lib/api/hooks';
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
+import { redirect } from "next/navigation";
+import {
+  authServerService,
+  booksServerService,
+  entriesServerService,
+} from "@/lib/api/server-services";
+import { MainLayoutClient } from "./MainLayoutClient";
+import { IUser } from "@/types/user";
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-export const MainLayout = ({ children }: MainLayoutProps) => {
+export async function MainLayout({ children }: MainLayoutProps) {
+  const queryClient = new QueryClient();
 
-  
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["userServer"],
+      queryFn: authServerService.me,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["booksServer", { limit: 100 }],
+      queryFn: () => booksServerService.getAll({ limit: 100 }),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["entriesServer", { limit: 100 }],
+      queryFn: () => entriesServerService.getAll({ limit: 100 }),
+    }),
+  ]);
+
+  const user = queryClient.getQueryData<IUser>(["userServer"]);
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const dehydratedState = dehydrate(queryClient);
+
   return (
-    <div className="min-h-screen bg-background">
-      <Sidebar />
-      <motion.main
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="ml-64 min-h-screen"
-      >
-        {children}
-      </motion.main>
-      <CreateBookDialog />
-    </div>
+    <HydrationBoundary state={dehydratedState}>
+      <MainLayoutClient>{children}</MainLayoutClient>
+    </HydrationBoundary>
   );
-};
-
+}

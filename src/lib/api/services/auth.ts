@@ -1,17 +1,19 @@
-import { apiClient } from '../client';
-import { LoginInput, RegisterInput, AuthResponse } from '@/types/auth';
+import { IUser } from "@/types/user";
+import { apiClient } from "../client";
+import { ILoginInput, IRegisterInput, IAuthResponse } from "@/types/auth";
 
 export const authService = {
-  login: (data: LoginInput) =>
-    apiClient.post<AuthResponse>('/auth/login', data),
+  me: (access_token: string) =>
+    apiClient.get<IUser>("/auth/me", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    }),
+  login: (data: ILoginInput) =>
+    apiClient.post<IAuthResponse>("/auth/login", data),
 
-  register: (data: RegisterInput) =>
-    apiClient.post<AuthResponse>('/auth/register', data),
+  register: (data: IRegisterInput) =>
+    apiClient.post<IAuthResponse>("/auth/register", data),
 
-  logout: () =>
-    apiClient.post<void>('/auth/logout'),
+  logout: () => apiClient.post<void>("/auth/logout"),
 
-  refreshToken: () =>
-    apiClient.post<AuthResponse>('/auth/refresh'),
+  refreshToken: () => apiClient.post<IAuthResponse>("/auth/refresh"),
 };
-

@@ -1,15 +1,14 @@
-import { create } from 'zustand';
-import { Entry } from '@/types/journal';
+import { create } from "zustand";
+import { IEntry } from "@/types/journal";
 
 interface EntriesState {
-  entries: Entry[];
-  selectedEntry: Entry | null;
-  setEntries: (entries: Entry[]) => void;
-  addEntry: (entry: Entry) => void;
-  updateEntry: (id: string, entry: Partial<Entry>) => void;
+  entries: IEntry[];
+  selectedEntry: IEntry | null;
+  setEntries: (entries: IEntry[]) => void;
+  addEntry: (entry: IEntry) => void;
+  updateEntry: (id: string, entry: Partial<IEntry>) => void;
   deleteEntry: (id: string) => void;
-  selectEntry: (entry: Entry | null) => void;
-  toggleFavorite: (id: string) => void;
+  selectEntry: (entry: IEntry | null) => void;
 }
 
 export const useEntriesStore = create<EntriesState>((set) => ({
@@ -28,11 +27,4 @@ export const useEntriesStore = create<EntriesState>((set) => ({
       entries: state.entries.filter((entry) => entry.id !== id),
     })),
   selectEntry: (entry) => set({ selectedEntry: entry }),
-  toggleFavorite: (id) =>
-    set((state) => ({
-      entries: state.entries.map((entry) =>
-        entry.id === id ? { ...entry, isFavorite: !entry.isFavorite } : entry
-      ),
-    })),
 }));
-

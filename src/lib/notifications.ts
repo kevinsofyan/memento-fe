@@ -1,4 +1,4 @@
-import { toast } from 'sonner';
+import { toast } from "sonner";
 
 export const notifications = {
   success: (message: string, description?: string) => {
@@ -31,7 +31,7 @@ export const notifications = {
     });
   },
 
-  promise: <T,>(
+  promise: <T>(
     promise: Promise<T>,
     messages: {
       loading: string;
@@ -46,4 +46,3 @@ export const notifications = {
     });
   },
 };
-

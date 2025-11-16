@@ -1,14 +1,16 @@
-import { serverApiClient } from '../server-client';
-import { User } from '@/types/auth';
+import { IUser } from "@/types/user";
+import { serverApiClient } from "../server-client";
 
 export const authServerService = {
-  me: async (): Promise<User | null> => {
+  me: async (): Promise<IUser | null> => {
     try {
-      return await serverApiClient.get<User>('/auth/me');
+      return await serverApiClient.get<IUser>("/auth/me");
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      if (error && typeof error === "object" && "digest" in error) {
+        throw error;
+      }
+      console.error("Failed to fetch user:", error);
       return null;
     }
   },
 };
-

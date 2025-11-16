@@ -1,29 +1,37 @@
-import { Suspense } from 'react';
-import { MainLayout } from '@/components/layouts/MainLayout';
-import { EntriesHeader } from './EntriesHeader';
-import { EntriesClient } from './EntriesClient';
-import { CreateEntryDialog } from '@/components/journal/CreateEntryDialog';
-import { booksServerService, entriesServerService } from '@/lib/api/server-services';
-import { redirect } from 'next/navigation';
-import { Book } from '@/types/journal';
+import { Suspense } from "react";
+import { MainLayout } from "@/components/layouts/MainLayout";
+import { EntriesHeader } from "./EntriesHeader";
+import { EntriesClient } from "./EntriesClient";
+import { entriesServerService } from "@/lib/api/server-services";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+
 interface EntriesPageProps {
-  params: {
+  params: Promise<{
     bookId: string;
-  };    
+  }>;
 }
 
 async function EntriesContent({ bookId }: { bookId: string }) {
-  const [book, entriesResponse] = await Promise.all([
-    booksServerService.getById(bookId), 
-    entriesServerService.getAll({ bookId })
-  ]);
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["getEntries", { bookId }],
+    queryFn: async () => {
+      return entriesServerService.getAll({ bookId });
+    },
+  });
+
+  const dehydratedState = dehydrate(queryClient);
 
   return (
-    <>
-      <EntriesHeader book={book} />
-      <EntriesClient initialEntries={entriesResponse.data} />
-      <CreateEntryDialog bookId={bookId} />
-    </>
+    <HydrationBoundary state={dehydratedState}>
+      <EntriesHeader bookId={bookId} />
+      <EntriesClient bookId={bookId} />
+    </HydrationBoundary>
   );
 }
 
@@ -37,12 +45,14 @@ function EntriesLoading() {
   );
 }
 
-export default function EntriesPage({ params }: EntriesPageProps) {
+export default async function EntriesPage({ params }: EntriesPageProps) {
+  const { bookId } = await params;
+
   return (
     <MainLayout>
       <div className="container mx-auto px-8 py-12">
         <Suspense fallback={<EntriesLoading />}>
-          <EntriesContent bookId={params.bookId} />
+          <EntriesContent bookId={bookId} />
         </Suspense>
       </div>
     </MainLayout>

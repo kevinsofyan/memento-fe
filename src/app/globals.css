@@ -8,7 +8,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -26,7 +26,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -35,7 +35,7 @@
 
 :root {
   --radius: 0.625rem;
-  
+
   --background: #ffffff;
   --foreground: #0a0a0a;
   --card: #ffffff;
@@ -83,36 +83,43 @@
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
-  
+
   h1 {
     @apply text-4xl lg:text-5xl;
   }
-  
+
   h2 {
     @apply text-3xl lg:text-4xl;
   }
-  
+
   h3 {
     @apply text-2xl lg:text-3xl;
   }
-  
+
   h4 {
     @apply text-xl lg:text-2xl;
   }
-  
+
   p {
     @apply leading-relaxed;
   }
-  
+
   ::selection {
     @apply bg-primary/20;
   }
@@ -122,16 +129,120 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .perspective-1000 {
     perspective: 1000px;
   }
-  
+
   .preserve-3d {
     transform-style: preserve-3d;
   }
-  
+
   .backface-hidden {
     backface-visibility: hidden;
+  }
+}
+
+@layer base {
+  .ProseMirror {
+    @apply focus:outline-none;
+  }
+
+  .ProseMirror p.is-editor-empty:first-child::before {
+    @apply text-muted-foreground;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .ProseMirror img {
+    @apply rounded-lg max-w-full h-auto my-4 transition-all;
+    position: relative;
+    cursor: default;
+  }
+
+  .ProseMirror img:hover {
+    @apply ring-2 ring-primary;
+  }
+
+  .ProseMirror img:hover::after {
+    content: "↔";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: hsl(var(--primary));
+    color: white;
+    padding: 8px 4px;
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+    pointer-events: none;
+    font-weight: bold;
+    opacity: 0.9;
+  }
+
+  .ProseMirror img.ProseMirror-selectednode {
+    @apply ring-4 ring-primary;
+    position: relative;
+  }
+
+  .ProseMirror img.ProseMirror-selectednode::after {
+    content: "↔";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: hsl(var(--primary));
+    color: white;
+    padding: 8px 4px;
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+    pointer-events: none;
+    font-weight: bold;
+  }
+
+  .ProseMirror h1 {
+    @apply text-3xl font-bold mt-6 mb-4;
+  }
+
+  .ProseMirror h2 {
+    @apply text-2xl font-bold mt-5 mb-3;
+  }
+
+  .ProseMirror h3 {
+    @apply text-xl font-bold mt-4 mb-2;
+  }
+
+  .ProseMirror ul {
+    @apply list-disc list-inside my-4;
+  }
+
+  .ProseMirror ol {
+    @apply list-decimal list-inside my-4;
+  }
+
+  .ProseMirror li {
+    @apply my-1;
+  }
+
+  .ProseMirror blockquote {
+    @apply border-l-4 border-primary pl-4 italic my-4;
+  }
+
+  .ProseMirror code {
+    @apply bg-muted px-1 py-0.5 rounded text-sm font-mono;
+  }
+
+  .ProseMirror pre {
+    @apply bg-muted p-4 rounded-lg my-4 overflow-x-auto;
+  }
+
+  .ProseMirror pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .ProseMirror a {
+    @apply text-primary underline cursor-pointer hover:text-primary/80;
   }
 }

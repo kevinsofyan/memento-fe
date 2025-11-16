@@ -14,7 +14,10 @@ class HttpClient {
     this.baseUrl = baseUrl;
   }
 
-  private buildUrl(endpoint: string, params?: Record<string, string | number | boolean>): string {
+  private buildUrl(
+    endpoint: string,
+    params?: Record<string, string | number | boolean>
+  ): string {
     const url = new URL(endpoint, this.baseUrl);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -43,7 +46,11 @@ class HttpClient {
     return this.handleResponse<T>(response);
   }
 
-  async post<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T> {
+  async post<T>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig
+  ): Promise<T> {
     const url = this.buildUrl(endpoint, config?.params);
     const response = await fetch(url, {
       ...config,
@@ -57,7 +64,11 @@ class HttpClient {
     return this.handleResponse<T>(response);
   }
 
-  async put<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T> {
+  async put<T>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig
+  ): Promise<T> {
     const url = this.buildUrl(endpoint, config?.params);
     const response = await fetch(url, {
       ...config,
@@ -71,7 +82,11 @@ class HttpClient {
     return this.handleResponse<T>(response);
   }
 
-  async patch<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T> {
+  async patch<T>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig
+  ): Promise<T> {
     const url = this.buildUrl(endpoint, config?.params);
     const response = await fetch(url, {
       ...config,

@@ -5,9 +5,11 @@ This guide shows how to use the reusable notification and confirmation dialog sy
 ## Components
 
 ### 1. Toast Notifications (`notifications`)
+
 For showing quick feedback messages to users.
 
 ### 2. Confirm Dialog (`ConfirmDialog`)
+
 For asking users to confirm important actions (like deletions).
 
 ---
@@ -17,49 +19,62 @@ For asking users to confirm important actions (like deletions).
 Import from `@/lib/notifications`:
 
 ```typescript
-import { notifications } from '@/lib/notifications';
+import { notifications } from "@/lib/notifications";
 ```
 
 ### Available Methods:
 
 #### Success Notification
+
 ```typescript
-notifications.success('Book created', 'Your book has been created successfully.');
+notifications.success(
+  "Book created",
+  "Your book has been created successfully."
+);
 ```
 
 #### Error Notification
+
 ```typescript
-notifications.error('Failed to delete', 'Please try again later.');
+notifications.error("Failed to delete", "Please try again later.");
 ```
 
 #### Info Notification
+
 ```typescript
-notifications.info('New feature', 'Check out our new dark mode!');
+notifications.info("New feature", "Check out our new dark mode!");
 ```
 
 #### Warning Notification
+
 ```typescript
-notifications.warning('Storage limit', 'You are approaching your storage limit.');
+notifications.warning(
+  "Storage limit",
+  "You are approaching your storage limit."
+);
 ```
 
 #### Loading Notification
+
 ```typescript
-const loadingToast = notifications.loading('Syncing...', 'Please wait while we sync your data.');
+const loadingToast = notifications.loading(
+  "Syncing...",
+  "Please wait while we sync your data."
+);
 // Later, dismiss it:
 toast.dismiss(loadingToast);
 ```
 
 #### Promise Notification
+
 Auto-updates based on promise state:
+
 ```typescript
-notifications.promise(
-  apiCall(),
-  {
-    loading: 'Uploading...',
-    success: 'Upload complete!',
-    error: 'Upload failed',
-  }
-);
+notifications.promise(apiCall(), {
+  loading: "Uploading...",
+  success: "Upload complete!",
+  error: "Upload failed",
+});
 ```
 
 ---
@@ -69,7 +84,7 @@ notifications.promise(
 Import from `@/components/ConfirmDialog`:
 
 ```typescript
-import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 ```
 
 ### Example Usage:
@@ -128,17 +143,17 @@ export function MyComponent() {
 
 ### Props:
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `open` | `boolean` | - | Controls dialog visibility |
-| `onOpenChange` | `(open: boolean) => void` | - | Called when dialog should close |
-| `onConfirm` | `() => void` | - | Called when user confirms |
-| `title` | `string` | - | Dialog title |
-| `description` | `string` | - | Dialog description/warning text |
-| `confirmText` | `string` | `'Confirm'` | Text for confirm button |
-| `cancelText` | `string` | `'Cancel'` | Text for cancel button |
-| `variant` | `'default' \| 'destructive' \| 'warning' \| 'info'` | `'default'` | Visual style variant |
-| `isLoading` | `boolean` | `false` | Shows loading state |
+| Prop           | Type                                                | Default     | Description                     |
+| -------------- | --------------------------------------------------- | ----------- | ------------------------------- |
+| `open`         | `boolean`                                           | -           | Controls dialog visibility      |
+| `onOpenChange` | `(open: boolean) => void`                           | -           | Called when dialog should close |
+| `onConfirm`    | `() => void`                                        | -           | Called when user confirms       |
+| `title`        | `string`                                            | -           | Dialog title                    |
+| `description`  | `string`                                            | -           | Dialog description/warning text |
+| `confirmText`  | `string`                                            | `'Confirm'` | Text for confirm button         |
+| `cancelText`   | `string`                                            | `'Cancel'`  | Text for cancel button          |
+| `variant`      | `'default' \| 'destructive' \| 'warning' \| 'info'` | `'default'` | Visual style variant            |
+| `isLoading`    | `boolean`                                           | `false`     | Shows loading state             |
 
 ### Variants:
 
@@ -164,7 +179,7 @@ export function BooksContentClient() {
     bookId: null,
     bookTitle: '',
   });
-  
+
   const { remove } = useBookMutations();
 
   const handleDeleteClick = (bookId: string, bookTitle: string) => {
@@ -194,7 +209,7 @@ export function BooksContentClient() {
   return (
     <>
       <BookCard onDelete={() => handleDeleteClick(book.id, book.title)} />
-      
+
       <ConfirmDialog
         open={deleteDialog.open}
         onOpenChange={(open) => setDeleteDialog({ open, bookId: null, bookTitle: '' })}
@@ -242,4 +257,3 @@ export const Providers = ({ children }: ProvidersProps) => {
 ```
 
 No additional setup required - just import and use! 🎉
-

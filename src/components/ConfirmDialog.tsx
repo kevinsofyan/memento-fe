@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   AlertDialog,
@@ -9,8 +9,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { AlertTriangle, Trash2, AlertCircle, Info } from 'lucide-react';
+} from "@/components/ui/alert-dialog";
+import { AlertTriangle, Trash2, AlertCircle, Info } from "lucide-react";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -20,30 +20,31 @@ interface ConfirmDialogProps {
   description: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: 'default' | 'destructive' | 'warning' | 'info';
+  variant?: "default" | "destructive" | "warning" | "info";
   isLoading?: boolean;
 }
 
 const variantConfig = {
   default: {
     icon: Info,
-    iconColor: 'text-primary',
-    confirmClass: '',
+    iconColor: "text-primary",
+    confirmClass: "",
   },
   destructive: {
     icon: Trash2,
-    iconColor: 'text-destructive',
-    confirmClass: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+    iconColor: "text-destructive",
+    confirmClass:
+      "bg-destructive text-destructive-foreground hover:bg-destructive/90",
   },
   warning: {
     icon: AlertTriangle,
-    iconColor: 'text-yellow-500',
-    confirmClass: 'bg-yellow-500 text-white hover:bg-yellow-600',
+    iconColor: "text-yellow-500",
+    confirmClass: "bg-yellow-500 text-white hover:bg-yellow-600",
   },
   info: {
     icon: AlertCircle,
-    iconColor: 'text-blue-500',
-    confirmClass: 'bg-blue-500 text-white hover:bg-blue-600',
+    iconColor: "text-blue-500",
+    confirmClass: "bg-blue-500 text-white hover:bg-blue-600",
   },
 };
 
@@ -53,9 +54,9 @@ export function ConfirmDialog({
   onConfirm,
   title,
   description,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
-  variant = 'default',
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  variant = "default",
   isLoading = false,
 }: ConfirmDialogProps) {
   const config = variantConfig[variant];
@@ -76,7 +77,9 @@ export function ConfirmDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>{cancelText}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>
+            {cancelText}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -85,11 +88,10 @@ export function ConfirmDialog({
             disabled={isLoading}
             className={config.confirmClass}
           >
-            {isLoading ? 'Processing...' : confirmText}
+            {isLoading ? "Processing..." : confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
-

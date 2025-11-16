@@ -1,18 +1,25 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { motion } from 'framer-motion';
-import { Mail, Lock, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useAuthMutations, useUser } from '@/lib/api/hooks';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { motion } from "framer-motion";
+import { Mail, Lock, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useAuthMutations, useUser } from "@/lib/api/hooks";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -20,12 +27,11 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const { login } = useAuthMutations();
 
-
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
@@ -46,7 +52,6 @@ export function LoginForm() {
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                  
                     placeholder="you@example.com"
                     className="pl-10"
                     error={!!form.formState.errors.email}
@@ -85,7 +90,7 @@ export function LoginForm() {
         {login.isError && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm"
           >
             Invalid email or password. Please try again.
@@ -99,11 +104,10 @@ export function LoginForm() {
               Signing in...
             </>
           ) : (
-            'Sign In'
+            "Sign In"
           )}
         </Button>
       </form>
     </Form>
   );
 }
-

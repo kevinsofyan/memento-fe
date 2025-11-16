@@ -1,4 +1,4 @@
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 type FetchOptions = RequestInit & {
   params?: Record<string, string | number | boolean | undefined>;
@@ -11,7 +11,7 @@ class APIError extends Error {
     message: string
   ) {
     super(message);
-    this.name = 'APIError';
+    this.name = "APIError";
   }
 }
 
@@ -23,9 +23,9 @@ class APIClient {
   }
 
   private getAuthToken(): string | null {
-    const authStorage = Cookies.get('memento-auth-storage');
+    const authStorage = Cookies.get("memento-auth-storage");
     if (!authStorage) return null;
-    
+
     try {
       const parsed = JSON.parse(authStorage);
       return parsed.state?.access_token || null;
@@ -34,11 +34,18 @@ class APIClient {
     }
   }
 
-  private buildURL(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
-    const baseURL = this.baseURL.endsWith('/') ? this.baseURL : `${this.baseURL}/`;
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+  private buildURL(
+    endpoint: string,
+    params?: Record<string, string | number | boolean | undefined>
+  ): string {
+    const baseURL = this.baseURL.endsWith("/")
+      ? this.baseURL
+      : `${this.baseURL}/`;
+    const cleanEndpoint = endpoint.startsWith("/")
+      ? endpoint.slice(1)
+      : endpoint;
     const url = new URL(cleanEndpoint, baseURL);
-    
+
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -46,7 +53,7 @@ class APIClient {
         }
       });
     }
-    
+
     return url.toString();
   }
 
@@ -56,13 +63,15 @@ class APIClient {
   ): Promise<T> {
     const { params, ...fetchOptions } = options;
     const token = this.getAuthToken();
-    
+
     const url = this.buildURL(endpoint, params);
-    
+
+    const isFormData = fetchOptions.body instanceof FormData;
+
     const config: RequestInit = {
       ...fetchOptions,
       headers: {
-        'Content-Type': 'application/json',
+        ...(!isFormData && { "Content-Type": "application/json" }),
         ...(token && { Authorization: `Bearer ${token}` }),
         ...fetchOptions.headers,
       },
@@ -72,11 +81,13 @@ class APIClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        const errorMessage = await response.text().catch(() => response.statusText);
+        const errorMessage = await response
+          .text()
+          .catch(() => response.statusText);
         throw new APIError(
           response.status,
           response.statusText,
-          errorMessage || 'An error occurred'
+          errorMessage || "An error occurred"
         );
       }
 
@@ -84,8 +95,8 @@ class APIClient {
         return undefined as T;
       }
 
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
         return response.json();
       }
 
@@ -94,46 +105,60 @@ class APIClient {
       if (error instanceof APIError) {
         throw error;
       }
-      throw new Error(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Network error: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     }
   }
 
   async get<T>(endpoint: string, options?: FetchOptions): Promise<T> {
-    return this.request<T>(endpoint, { ...options, method: 'GET' });
+    return this.request<T>(endpoint, { ...options, method: "GET" });
   }
 
-  async post<T>(endpoint: string, data?: unknown, options?: FetchOptions): Promise<T> {
+  async post<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: FetchOptions
+  ): Promise<T> {
+    const body = data instanceof FormData ? data : data ? JSON.stringify(data) : undefined;
     return this.request<T>(endpoint, {
       ...options,
-      method: 'POST',
+      method: "POST",
+      body,
+    });
+  }
+
+  async put<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: FetchOptions
+  ): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...options,
+      method: "PUT",
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put<T>(endpoint: string, data?: unknown, options?: FetchOptions): Promise<T> {
+  async patch<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: FetchOptions
+  ): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
-      method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
-    });
-  }
-
-  async patch<T>(endpoint: string, data?: unknown, options?: FetchOptions): Promise<T> {
-    return this.request<T>(endpoint, {
-      ...options,
-      method: 'PATCH',
+      method: "PATCH",
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   async delete<T>(endpoint: string, options?: FetchOptions): Promise<T> {
-    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+    return this.request<T>(endpoint, { ...options, method: "DELETE" });
   }
 }
 
 export const apiClient = new APIClient(
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 );
 
 export { APIError };
-

@@ -1,12 +1,12 @@
-import { cookies } from 'next/headers';
-import { User } from '@/types/auth';
+import { IUser } from "@/types/user";
+import { cookies } from "next/headers";
 
 export async function getServerAuthToken(): Promise<string | null> {
   const cookieStore = await cookies();
-  const authCookie = cookieStore.get('memento-auth-storage');
-  
+  const authCookie = cookieStore.get("memento-auth-storage");
+
   if (!authCookie) return null;
-  
+
   try {
     const authData = JSON.parse(authCookie.value);
     return authData?.state?.access_token || null;
@@ -15,12 +15,12 @@ export async function getServerAuthToken(): Promise<string | null> {
   }
 }
 
-export async function getServerUser(): Promise<User | null> {
+export async function getServerUser(): Promise<IUser | null> {
   const cookieStore = await cookies();
-  const userCookie = cookieStore.get('user-storage');
-  
+  const userCookie = cookieStore.get("user-storage");
+
   if (!userCookie) return null;
-  
+
   try {
     const userData = JSON.parse(userCookie.value);
     return userData?.state?.user || null;
@@ -28,4 +28,3 @@ export async function getServerUser(): Promise<User | null> {
     return null;
   }
 }
-

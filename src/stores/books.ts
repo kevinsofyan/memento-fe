@@ -1,14 +1,14 @@
-import { create } from 'zustand';
-import { Book } from '@/types/journal';
+import { create } from "zustand";
+import { IBook } from "@/types/journal";
 
 interface BooksState {
-  books: Book[];
-  selectedBook: Book | null;
-  setBooks: (books: Book[]) => void;
-  addBook: (book: Book) => void;
-  updateBook: (id: string, book: Partial<Book>) => void;
+  books: IBook[];
+  selectedBook: IBook | null;
+  setBooks: (books: IBook[]) => void;
+  addBook: (book: IBook) => void;
+  updateBook: (id: string, book: Partial<IBook>) => void;
   deleteBook: (id: string) => void;
-  selectBook: (book: Book | null) => void;
+  selectBook: (book: IBook | null) => void;
 }
 
 export const useBooksStore = create<BooksState>((set) => ({
@@ -28,4 +28,3 @@ export const useBooksStore = create<BooksState>((set) => ({
     })),
   selectBook: (book) => set({ selectedBook: book }),
 }));
-
